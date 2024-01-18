@@ -30,6 +30,11 @@ Makefile.in and configure files are not included in the repo, so they will have
 to be generated. To do so, make sure you have libtoolize and automake tools
 installed and run the following commands:
 
+```shell
+# In Ubuntu,
+sudo apt-get install libtool m4 automake
+```
+
 $ libtoolize
 $ aclocal
 $ autoheader
@@ -41,6 +46,11 @@ Step 2: Compilation and installation
 
 Before proceeding, make sure yacc and lex are available in your system. Then,
 you can proceed with configuration, compilation, and installation as usual:
+
+```shell
+# In Ubuntu,
+sudo apt-get install bison flex
+```
 
 $ ./configure
 $ make
