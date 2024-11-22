@@ -1,13 +1,13 @@
 #!/bin/bash
 set -ex
 # Default configurations #################
-BENCH_DIR="/home/yulistic/zjournal/bench/filebench"                                  # Set proper path.
+BENCH_DIR="/home/yulistic/oxbow/bench/filebench"                                  # Set proper path.
 #DIR="/mnt/ext4/filebench_test" # Basename is used as a bench run name. Use different name. Ex) /mnt/ext4/text_ext4 --> text_ext4 is name.
 NUM_THREADS="16 8 4 2 1" # Ex: "1 16 4 1"
-# WORKLOAD="${BENCH_DIR}/workloads/myfileserver.f"
-WORKLOAD="${BENCH_DIR}/workloads/myfileserver.f"
-PROFILE_CPU_UTILIZATION=1
-PINNING="numactl -N 1 -m 1"
+WORKLOADS="myfileserver.f myvarmail.f mywebserver.f"
+PROFILE_CPU_UTILIZATION=0
+PINNING=""
+# PINNING="numactl -N 1 -m 1"
 PERF_BIN="/lib/modules/$(uname -r)/source/tools/perf/perf" # Set correct perf bin path.
 ##########################################
 #
@@ -35,55 +35,58 @@ dropCache() {
 
 ### Microbench throughput
 loopFilebench() {
+	for wl in $WORKLOADS; do
+	WORKLOAD="${BENCH_DIR}/workloads/${wl}"
 
 	# Set workload path.
 	sed -i "/set \$dir=*/c\set \$dir=${DIR}" $WORKLOAD
 
-	for NUM_THREAD in $NUM_THREADS; do
+		for NUM_THREAD in $NUM_THREADS; do
 
-		# Configuration with the different number of threads.
-		[[ $(type -t configMultiThread) == function ]] && configMultiThread
+			# Configuration with the different number of threads.
+			[[ $(type -t configMultiThread) == function ]] && configMultiThread
 
-		# Set output file path.
-		OUT_DIR=$(basename $WORKLOAD)
-		OUT_DIR="$BENCH_DIR/results/${OUT_DIR%.*}/$(basename $DIR)"
-		mkdir -p $OUT_DIR
+			# Set output file path.
+			OUT_DIR=$(basename $WORKLOAD)
+			OUT_DIR="$BENCH_DIR/results/${OUT_DIR%.*}/$(basename $DIR)"
+			mkdir -p $OUT_DIR
 
-		# file name without extension.
-		OUT_FILE="$OUT_DIR/${NUM_THREAD}t"
+			# file name without extension.
+			OUT_FILE="$OUT_DIR/${NUM_THREAD}t"
 
-		echo "Dropping cache."
-		dropCache
+			echo "Dropping cache."
+			dropCache
 
-		if [ "$PROFILE_CPU_UTILIZATION" = "1" ]; then
-			### Using iostat
-			#OUT_CPU_FILE=${OUT_FILE}.cpu
-			## Start to record CPU utilization with time stamps in background.
-			#iostat -c 1 | awk '!/^$|avg-cpu|Linux/ {print systime(), $0}' >$OUT_CPU_FILE &
+			if [ "$PROFILE_CPU_UTILIZATION" = "1" ]; then
+				### Using iostat
+				#OUT_CPU_FILE=${OUT_FILE}.cpu
+				## Start to record CPU utilization with time stamps in background.
+				#iostat -c 1 | awk '!/^$|avg-cpu|Linux/ {print systime(), $0}' >$OUT_CPU_FILE &
 
-			### Using perf.
-			OUT_CPU_FILE=${OUT_FILE}.perfdata
-			PERF_PREFIX="sudo $PERF_BIN record -a -o $OUT_CPU_FILE --"
-		else
-			PERF_PREFIX=""
-		fi
+				### Using perf.
+				OUT_CPU_FILE=${OUT_FILE}.perfdata
+				PERF_PREFIX="sudo $PERF_BIN record -a -o $OUT_CPU_FILE --"
+			else
+				PERF_PREFIX=""
+			fi
 
-		# if [[ -n $OXBOW_PREFIX && $DIR == *"$OXBOW_PREFIX" ]]; then
-		#         CMD="$PINNING $LIBFS/run.sh filebench -f $WORKLOAD"
-		# else
-		#	CMD="sudo $PINNING filebench -f $WORKLOAD"
-		# fi
+			# if [[ -n $OXBOW_PREFIX && $DIR == *"$OXBOW_PREFIX" ]]; then
+			#         CMD="$PINNING $LIBFS/run.sh filebench -f $WORKLOAD"
+			# else
+			#	CMD="sudo $PINNING filebench -f $WORKLOAD"
+			# fi
 
-		# Print mount state.
-		sudo mount > ${OUT_FILE}.mount
+			# Print mount state.
+			sudo mount > ${OUT_FILE}.mount
 
-		runFileSystemSpecific
+			runFileSystemSpecific
 
-		# if [ "$PROFILE_CPU_UTILIZATION" = "1" ]; then
-		#         # Kill top background process.
-		#         sudo pkill -9 -x "iostat"
-		# fi
+			# if [ "$PROFILE_CPU_UTILIZATION" = "1" ]; then
+			#         # Kill top background process.
+			#         sudo pkill -9 -x "iostat"
+			# fi
 
+		done
 	done
 }
 

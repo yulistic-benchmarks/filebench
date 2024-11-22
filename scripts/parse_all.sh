@@ -66,7 +66,7 @@ getCpuCycles() {
 # $1 = myvarmail
 parseWorkload() {
 
-	echo " Extracting CPU usage from perf data."
+	# Extracting CPU usage from perf data.
 	for d in $1/*; do
 		if ! [ -d "$d" ]; then
 			continue
@@ -133,6 +133,12 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	fi
 
 	for dir in $1/*; do
-		parseWorkload $dir
+		parseWorkload $dir > temp_result.txt
+
+		# Sort and print
+		cat temp_result.txt | head -n 2
+		cat temp_result.txt | tail -n +3 | sort -t, -k1,1 -k2,2n
+		rm temp_result.txt
+
 	done
 fi
