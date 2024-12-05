@@ -3,11 +3,12 @@ set -ex
 # Default configurations #################
 BENCH_DIR="/home/yulistic/zjournal/bench/filebench"                                  # Set proper path.
 #DIR="/mnt/ext4/filebench_test" # Basename is used as a bench run name. Use different name. Ex) /mnt/ext4/text_ext4 --> text_ext4 is name.
+# NUM_THREADS="1 2 4 8 16" # Ex: "1 16 4 1"
 NUM_THREADS="16 8 4 2 1" # Ex: "1 16 4 1"
 # WORKLOAD="${BENCH_DIR}/workloads/myfileserver.f"
-WORKLOAD="${BENCH_DIR}/workloads/myfileserver.f"
-PROFILE_CPU_UTILIZATION=1
-PINNING="numactl -N 1 -m 1"
+WORKLOAD="${BENCH_DIR}/workloads/myvarmail.f"
+PROFILE_CPU_UTILIZATION=0
+PINNING=""
 PERF_BIN="/lib/modules/$(uname -r)/source/tools/perf/perf" # Set correct perf bin path.
 ##########################################
 #
