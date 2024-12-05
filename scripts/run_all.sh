@@ -28,11 +28,6 @@ DATE=$(date +"%y%m%d-%H%M%S")
 # Disable randomization. Filebench issue.
 echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 
-dropCache() {
-	{ echo 3 | sudo tee /proc/sys/vm/drop_caches; } &>/dev/null
-	sleep 10
-}
-
 ### Microbench throughput
 loopFilebench() {
 	for wl in $WORKLOADS; do
@@ -55,7 +50,7 @@ loopFilebench() {
 			OUT_FILE="$OUT_DIR/${NUM_THREAD}t"
 
 			echo "Dropping cache."
-			dropCache
+			flushCache
 
 			if [ "$PROFILE_CPU_UTILIZATION" = "1" ]; then
 				### Using iostat

@@ -20,6 +20,15 @@ TOTAL_JOURNAL_SIZE=$((38 * 1024)) # 38 GB
 ############# Overriding configurations.
 # NUM_THREADS="1 4 8 16"
 
+dropCache() {
+	{ echo 3 | sudo tee /proc/sys/vm/drop_caches; } &>/dev/null
+	sleep 10
+}
+
+flushCache() {
+	dropCache
+}
+
 umountFS() {
 	sudo umount $MOUNT_PATH || true
 }
