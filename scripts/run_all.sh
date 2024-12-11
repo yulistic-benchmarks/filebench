@@ -3,9 +3,10 @@ set -ex
 # Default configurations #################
 BENCH_DIR="/home/yulistic/oxbow/bench/filebench"                                  # Set proper path.
 #DIR="/mnt/ext4/filebench_test" # Basename is used as a bench run name. Use different name. Ex) /mnt/ext4/text_ext4 --> text_ext4 is name.
-NUM_THREADS="16 8 4 2 1" # Ex: "1 16 4 1"
-WORKLOADS="myfileserver.f myvarmail.f mywebserver.f"
-PROFILE_CPU_UTILIZATION=0
+NUM_THREADS="1 2 4 8 16" # Ex: "1 16 4 1"
+# WORKLOADS="myfileserver.f myvarmail.f mywebserver.f"
+WORKLOADS="myvarmail.f"
+PROFILE_CPU_UTILIZATION=1
 PINNING=""
 # PINNING="numactl -N 1 -m 1"
 PERF_BIN="/lib/modules/$(uname -r)/source/tools/perf/perf" # Set correct perf bin path.
@@ -31,10 +32,10 @@ echo 0 | sudo tee /proc/sys/kernel/randomize_va_space
 ### Microbench throughput
 loopFilebench() {
 	for wl in $WORKLOADS; do
-	WORKLOAD="${BENCH_DIR}/workloads/${wl}"
+		WORKLOAD="${BENCH_DIR}/workloads/${wl}"
 
-	# Set workload path.
-	sed -i "/set \$dir=*/c\set \$dir=${DIR}" $WORKLOAD
+		# Set workload path.
+		sed -i "/set \$dir=*/c\set \$dir=${DIR}" $WORKLOAD
 
 		for NUM_THREAD in $NUM_THREADS; do
 
@@ -60,7 +61,7 @@ loopFilebench() {
 
 				### Using perf.
 				OUT_CPU_FILE=${OUT_FILE}.perfdata
-				PERF_PREFIX="sudo $PERF_BIN record -a -o $OUT_CPU_FILE --"
+				PERF_PREFIX="sudo $PERF_BIN record -F 99 -e cycles -a -o $OUT_CPU_FILE --"
 			else
 				PERF_PREFIX=""
 			fi

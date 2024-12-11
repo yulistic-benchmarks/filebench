@@ -37,8 +37,9 @@ initOxbow() {
 
 killBgOxbow() {
 	# Kill Daemon
+	sleep 5
 	echo "[OXBOW_MICROBENCH] Kill secure daemon($DAEMON_PID) and umount Oxbow."
-	$SECURE_DAEMON/run.sh -k
+	$SECURE_DAEMON/run.sh -k || true
 	sleep 5
 
 	# sudo kill -9 $DAEMON_PID

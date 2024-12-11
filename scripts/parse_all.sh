@@ -14,7 +14,7 @@ getAggrCPUUsage(){
 	report_file="${d_path}/${f_name}.report"
 
 	# sudo $PERF_BIN report --sort overhead -i $1 -F overhead,pid,period,socket --stdio > $report_file
-	sudo $PERF_BIN report --sort overhead -i $1 -F overhead,comm,period,socket --stdio > $report_file
+	sudo $PERF_BIN report --sort overhead -i $1 -F overhead,comm,period,socket -f --stdio > $report_file
 
 	# cat only the processes that consumes more than 1% of CPU.
 	cat $report_file | grep -v -E " 0...%|#" > ${d_path}/${f_name}.cpu

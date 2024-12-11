@@ -68,8 +68,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 	DIR="$MOUNT_PATH/ext4_journal"
 
 	# Configure and mount file system.
-	sudo mke2fs -t ext4 -J size=$TOTAL_JOURNAL_SIZE -F -G 1 $DEV_PATH
-	sudo mount -t ext4 -o data=journal $DEV_PATH $MOUNT_PATH
+	sudo mke2fs -t ext4 -J size=$TOTAL_JOURNAL_SIZE -E lazy_itable_init=0,lazy_journal_init=0 -F -G 1 $DEV_PATH
+	sudo mount -t ext4 -o barrier=0,data=journal $DEV_PATH $MOUNT_PATH
 	sudo chown -R $USER:$USER $MOUNT_PATH
 	mkdir -p $DIR
 
@@ -79,8 +79,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 
 	# Run data=ordered mode
 	DIR="$MOUNT_PATH/ext4_ordered"
-	sudo mke2fs -t ext4 -J size=$TOTAL_JOURNAL_SIZE -F -G 1 $DEV_PATH
-	sudo mount -t ext4 $DEV_PATH $MOUNT_PATH
+	sudo mke2fs -t ext4 -J size=$TOTAL_JOURNAL_SIZE -E lazy_itable_init=0,lazy_journal_init=0 -F -G 1 $DEV_PATH
+	sudo mount -t ext4 -o barrier=0,data=ordered $DEV_PATH $MOUNT_PATH
 	sudo chown -R $USER:$USER $MOUNT_PATH
 	mkdir -p $DIR
 
